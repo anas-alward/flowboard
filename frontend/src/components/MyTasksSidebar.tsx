@@ -1,19 +1,20 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { CheckSquareIcon, ChevronDownIcon, ChevronRightIcon } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
+import type { RootState } from '../app/store';
+import type { Task } from '../types';
 
-function MyTasksSidebar() {
+const MyTasksSidebar: React.FC = () => {
+    const user = { id: 'user_1' } // Mock user
 
-    const user = { id: 'user_1' }
-
-    const { currentWorkspace } = useSelector((state) => state.workspace);
+    const { currentWorkspace } = useSelector((state: RootState) => state.workspace);
     const [showMyTasks, setShowMyTasks] = useState(false);
-    const [myTasks, setMyTasks] = useState([]);
+    const [myTasks, setMyTasks] = useState<Task[]>([]);
 
     const toggleMyTasks = () => setShowMyTasks(prev => !prev);
 
-    const getTaskStatusColor = (status) => {
+    const getTaskStatusColor = (status: string) => {
         switch (status) {
             case 'DONE':
                 return 'bg-green-500';

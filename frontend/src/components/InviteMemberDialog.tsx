@@ -1,19 +1,29 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { Mail, UserPlus } from "lucide-react";
 import { useSelector } from "react-redux";
+import type { RootState } from "../app/store";
 
-const InviteMemberDialog = ({ isDialogOpen, setIsDialogOpen }) => {
+interface InviteMemberDialogProps {
+    isDialogOpen: boolean;
+    setIsDialogOpen: (open: boolean) => void;
+}
 
-    const currentWorkspace = useSelector((state) => state.workspace?.currentWorkspace || null);
+interface InviteFormData {
+    email: string;
+    role: string;
+}
+
+const InviteMemberDialog: React.FC<InviteMemberDialogProps> = ({ isDialogOpen, setIsDialogOpen }) => {
+    const currentWorkspace = useSelector((state: RootState) => state.workspace?.currentWorkspace);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [formData, setFormData] = useState({
+    const [formData, setFormData] = useState<InviteFormData>({
         email: "",
         role: "org:member",
     });
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-
+        // logic here
     };
 
     if (!isDialogOpen) return null;

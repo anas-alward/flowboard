@@ -1,8 +1,13 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { format, isSameDay, isBefore, startOfMonth, endOfMonth, eachDayOfInterval, addMonths, subMonths } from "date-fns";
-import { CalendarIcon, Clock, User, ChevronLeft, ChevronRight } from "lucide-react";
+import { CalendarIcon, ChevronLeft, ChevronRight, User, Clock } from "lucide-react";
+import type { Task } from "../types";
 
-const typeColors = {
+interface ProjectCalendarProps {
+    tasks: Task[];
+}
+
+const typeColors: Record<string, string> = {
     BUG: "bg-red-200 text-red-800 dark:bg-red-500 dark:text-red-900",
     FEATURE: "bg-blue-200 text-blue-800 dark:bg-blue-500 dark:text-blue-900",
     TASK: "bg-green-200 text-green-800 dark:bg-green-500 dark:text-green-900",
@@ -10,33 +15,35 @@ const typeColors = {
     OTHER: "bg-amber-200 text-amber-800 dark:bg-amber-500 dark:text-amber-900",
 };
 
-const priorityBorders = {
+const priorityBorders: Record<string, string> = {
     LOW: "border-zinc-300 dark:border-zinc-600",
     MEDIUM: "border-amber-300 dark:border-amber-500",
     HIGH: "border-orange-300 dark:border-orange-500",
 };
 
-const ProjectCalendar = ({ tasks }) => {
+const ProjectCalendar: React.FC<ProjectCalendarProps> = ({ tasks }) => {
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [currentMonth, setCurrentMonth] = useState(new Date());
 
     const today = new Date();
-    const getTasksForDate = (date) => tasks.filter((task) => isSameDay(task.due_date, date));
+    const getTasksForDate = (date: Date) => tasks.filter((task: Task) => task.due_date && isSameDay(new Date(task.due_date), date));
 
     const upcomingTasks = tasks
-        .filter((task) => task.due_date && !isBefore(task.due_date, today) && task.status !== "DONE")
-        .sort((a, b) => new Date(a.due_date) - new Date(b.due_date))
+        .filter((task) => task.due_date && !isBefore(new Date(task.due_date), today) && task.status !== "DONE")
+        .sort((a, b) => {
+            if (!a.due_date || !b.due_date) return 0;
+            return new Date(a.due_date).getTime() - new Date(b.due_date).getTime();
+        })
         .slice(0, 5);
 
-    const overdueTasks = tasks.filter((task) => task.due_date && isBefore(task.due_date, today) && task.status !== "DONE");
+    const overdueTasks = tasks.filter((task) => task.due_date && isBefore(new Date(task.due_date), today) && task.status !== "DONE");
 
     const daysInMonth = eachDayOfInterval({
         start: startOfMonth(currentMonth),
         end: endOfMonth(currentMonth),
     });
 
-
-    const handleMonthChange = (direction) => {
+    const handleMonthChange = (direction: "next" | "prev") => {
         setCurrentMonth((prev) => (direction === "next" ? addMonths(prev, 1) : subMonths(prev, 1)));
     };
 
@@ -70,11 +77,11 @@ const ProjectCalendar = ({ tasks }) => {
                         {daysInMonth.map((day) => {
                             const dayTasks = getTasksForDate(day);
                             const isSelected = isSameDay(day, selectedDate);
-                            const hasOverdue = dayTasks.some((t) => t.status !== "DONE" && isBefore(t.due_date, today));
+                            const hasOverdue = dayTasks.some((t) => t.status !== "DONE" && t.due_date && isBefore(new Date(t.due_date), today));
 
                             return (
                                 <button
-                                    key={day}
+                                    key={day.toISOString()}
                                     onClick={() => setSelectedDate(day)}
                                     className={`sm:h-14 rounded-md flex flex-col items-center justify-center text-sm
                                     ${isSelected ? "bg-blue-200 text-blue-900 dark:bg-blue-600 dark:text-white" : "bg-zinc-50 text-zinc-900 dark:bg-zinc-800/40 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-700"}
@@ -100,11 +107,11 @@ const ProjectCalendar = ({ tasks }) => {
                             {getTasksForDate(selectedDate).map((task) => (
                                 <div
                                     key={task.id}
-                                    className={`bg-zinc-50 dark:bg-zinc-800/40 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition p-4 rounded border-l-4 ${priorityBorders[task.priority]}`}
+                                    className={`bg-zinc-50 dark:bg-zinc-800/40 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition p-4 rounded border-l-4 ${priorityBorders[task.priority] || "border-zinc-300"}`}
                                 >
                                     <div className="flex justify-between mb-2">
                                         <h4 className="text-zinc-900 dark:text-white font-medium">{task.title}</h4>
-                                        <span className={`px-2 py-0.5 rounded text-xs ${typeColors[task.type]}`}>
+                                        <span className={`px-2 py-0.5 rounded text-xs ${typeColors[task.type] || "bg-zinc-200"}`}>
                                             {task.type}
                                         </span>
                                     </div>
@@ -113,7 +120,7 @@ const ProjectCalendar = ({ tasks }) => {
                                         {task.assignee && (
                                             <span className="flex items-center gap-1">
                                                 <User className="w-3 h-3" />
-                                                {task.assignee.name}
+                                                {task.assignee.email}
                                             </span>
                                         )}
                                     </div>
@@ -142,11 +149,11 @@ const ProjectCalendar = ({ tasks }) => {
                                 >
                                     <div className="flex justify-between items-start text-sm">
                                         <span className="text-zinc-900 dark:text-white">{task.title}</span>
-                                        <span className={`text-xs px-2 py-0.5 rounded ${typeColors[task.type]}`}>
+                                        <span className={`text-xs px-2 py-0.5 rounded ${typeColors[task.type] || "bg-zinc-200"}`}>
                                             {task.type}
                                         </span>
                                     </div>
-                                    <p className="text-xs text-zinc-600 dark:text-zinc-400">{format(task.due_date, "MMM d")}</p>
+                                    <p className="text-xs text-zinc-600 dark:text-zinc-400">{task.due_date ? format(new Date(task.due_date), "MMM d") : "No date"}</p>
                                 </div>
                             ))}
                         </div>
@@ -155,7 +162,7 @@ const ProjectCalendar = ({ tasks }) => {
 
                 {/* Overdue Tasks */}
                 {overdueTasks.length > 0 && (
-                    <div className="bg-white dark:bg-zinc-950  border border-red-300 dark:border-red-500 border-l-4 rounded-lg p-4">
+                    <div className="bg-white dark:bg-zinc-950 border border-red-300 dark:border-red-500 border-l-4 rounded-lg p-4">
                         <h3 className="text-red-700 dark:text-red-400 text-sm flex items-center gap-2 mb-3">
                             <Clock className="w-4 h-4" /> Overdue Tasks ({overdueTasks.length})
                         </h3>
@@ -169,7 +176,7 @@ const ProjectCalendar = ({ tasks }) => {
                                         </span>
                                     </div>
                                     <p className="text-xs text-red-600 dark:text-red-300">
-                                        Due {format(task.due_date, "MMM d")}
+                                        Due {task.due_date ? format(new Date(task.due_date), "MMM d") : "No date"}
                                     </p>
                                 </div>
                             ))}

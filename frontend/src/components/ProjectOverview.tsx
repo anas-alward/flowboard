@@ -1,12 +1,14 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, Calendar, UsersIcon, FolderOpen } from "lucide-react";
 import { format } from "date-fns";
 import { useSelector } from "react-redux";
 import CreateProjectDialog from "./CreateProjectDialog";
+import type { RootState } from "../app/store";
+import type { Project } from "../types";
 
-const ProjectOverview = () => {
-    const statusColors = {
+const ProjectOverview: React.FC = () => {
+    const statusColors: Record<string, string> = {
         PLANNING: "bg-zinc-200 text-zinc-800 dark:bg-zinc-600 dark:text-zinc-200",
         ACTIVE: "bg-emerald-200 text-emerald-800 dark:bg-emerald-500 dark:text-emerald-900",
         ON_HOLD: "bg-amber-200 text-amber-800 dark:bg-amber-500 dark:text-amber-900",
@@ -14,21 +16,23 @@ const ProjectOverview = () => {
         CANCELLED: "bg-red-200 text-red-800 dark:bg-red-500 dark:text-red-900"
     };
 
-    const priorityColors = {
+    const priorityColors: Record<string, string> = {
         LOW: "border-zinc-300 text-zinc-600 dark:border-zinc-600 dark:text-zinc-400",
         MEDIUM: "border-amber-300 text-amber-700 dark:border-amber-500 dark:text-amber-400",
         HIGH: "border-green-300 text-green-700 dark:border-green-500 dark:text-green-400",
     };
 
-    const currentWorkspace = useSelector((state) => state?.workspace?.currentWorkspace || null);
+    const currentWorkspace = useSelector((state: RootState) => state?.workspace?.currentWorkspace);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
-    const [projects, setProjects] = useState([]);
+    const [projects, setProjects] = useState<Project[]>([]);
 
     useEffect(() => {
         setProjects(currentWorkspace?.projects || []);
     }, [currentWorkspace]);
 
-    return currentWorkspace && (
+    if (!currentWorkspace) return null;
+
+    return (
         <div className="bg-white dark:bg-zinc-950 dark:bg-gradient-to-br dark:from-zinc-800/70 dark:to-zinc-900/50 border border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 transition-all duration-200 rounded-lg overflow-hidden">
             <div className="border-b border-zinc-200 dark:border-zinc-800 p-4 flex items-center justify-between">
                 <h2 className="text-md text-zinc-800 dark:text-zinc-300">Project Overview</h2>
@@ -103,6 +107,6 @@ const ProjectOverview = () => {
             </div>
         </div>
     );
-}
+};
 
 export default ProjectOverview;

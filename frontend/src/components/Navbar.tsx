@@ -1,13 +1,19 @@
+import React from 'react';
 import { SearchIcon, PanelLeft } from 'lucide-react'
 import { useDispatch, useSelector } from 'react-redux'
 import { toggleTheme } from '../features/themeSlice'
 import { MoonIcon, SunIcon } from 'lucide-react'
 import { assets } from '../assets/assets'
+import type { RootState, AppDispatch } from '../app/store';
 
-const Navbar = ({ setIsSidebarOpen }) => {
+interface NavbarProps {
+    setIsSidebarOpen: React.Dispatch<React.SetStateAction<boolean>>;
+    isSidebarOpen: boolean;
+}
 
-    const dispatch = useDispatch();
-    const { theme } = useSelector(state => state.theme);
+const Navbar: React.FC<NavbarProps> = ({ setIsSidebarOpen }) => {
+    const dispatch = useDispatch<AppDispatch>();
+    const { theme } = useSelector((state: RootState) => state.theme);
 
     return (
         <div className="w-full bg-white dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 px-6 xl:px-16 py-3 flex-shrink-0">
@@ -15,7 +21,7 @@ const Navbar = ({ setIsSidebarOpen }) => {
                 {/* Left section */}
                 <div className="flex items-center gap-4 min-w-0 flex-1">
                     {/* Sidebar Trigger */}
-                    <button onClick={() => setIsSidebarOpen((prev) => !prev)} className="sm:hidden p-2 rounded-lg transition-colors text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-zinc-800" >
+                    <button onClick={() => setIsSidebarOpen((prev: boolean) => !prev)} className="sm:hidden p-2 rounded-lg transition-colors text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-zinc-800" >
                         <PanelLeft size={20} />
                     </button>
 
@@ -50,4 +56,4 @@ const Navbar = ({ setIsSidebarOpen }) => {
     )
 }
 
-export default Navbar
+export default Navbar;

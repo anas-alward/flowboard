@@ -136,14 +136,14 @@ AUTH_USER_MODEL = 'users.User'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'apps.users.authentication.JWTCookieAuthentication',
     )
 }
 
 from datetime import timedelta
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
-    'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
     'ROTATE_REFRESH_TOKENS': False,
     'ALGORITHM': 'HS256',
     'SIGNING_KEY': SECRET_KEY,
@@ -153,6 +153,14 @@ SIMPLE_JWT = {
     'USER_ID_CLAIM': 'user_id',
     'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
     'TOKEN_TYPE_CLAIM': 'token_type',
+    
+    # Cookie settings
+    'AUTH_COOKIE': 'refresh_token',  # Name of the refresh token cookie
+    'ACCESS_COOKIE': 'access_token', # Name of the access token cookie
+    'AUTH_COOKIE_PATH': '/',         
+    'AUTH_COOKIE_SECURE': False,     
+    'AUTH_COOKIE_HTTP_ONLY': True,   
+    'AUTH_COOKIE_SAMESITE': 'Lax',   
 }
 
 # Redis Cache configuration

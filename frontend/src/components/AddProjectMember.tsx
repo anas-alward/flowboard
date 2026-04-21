@@ -1,28 +1,33 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { Mail, UserPlus } from "lucide-react";
 import { useSelector } from "react-redux";
 import { useSearchParams } from "react-router-dom";
+import type { RootState } from "../app/store";
+import type { Project } from "../types";
 
-const AddProjectMember = ({ isDialogOpen, setIsDialogOpen }) => {
+interface AddProjectMemberProps {
+    isDialogOpen: boolean;
+    setIsDialogOpen: (open: boolean) => void;
+}
 
+const AddProjectMember: React.FC<AddProjectMemberProps> = ({ isDialogOpen, setIsDialogOpen }) => {
     const [searchParams] = useSearchParams();
-
     const id = searchParams.get('id');
 
-    const currentWorkspace = useSelector((state) => state.workspace?.currentWorkspace || null);
+    const currentWorkspace = useSelector((state: RootState) => state.workspace?.currentWorkspace);
 
-    const project = currentWorkspace?.projects.find((p) => p.id === id);
-    const projectMembersEmails = project?.members.map((member) => member.user.email);
+    const project = currentWorkspace?.projects.find((p: Project) => p.id === id);
+    const projectMembersEmails = project?.members.map((member) => member.user.email) || [];
 
     const [email, setEmail] = useState('');
     const [isAdding, setIsAdding] = useState(false);
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        
+        // logic here
     };
 
-    if (!isDialogOpen) return null;
+    if (!isDialogOpen || !project) return null;
 
     return (
         <div className="fixed inset-0 bg-black/20 dark:bg-black/50 backdrop-blur flex items-center justify-center z-50">

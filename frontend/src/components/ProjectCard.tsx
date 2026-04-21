@@ -1,6 +1,8 @@
+import React from "react";
 import { Link } from "react-router-dom";
+import type { Project } from "../types";
 
-const statusColors = {
+const statusColors: Record<string, string> = {
     PLANNING: "bg-gray-200 dark:bg-zinc-600 text-gray-900 dark:text-zinc-200",
     ACTIVE: "bg-emerald-200 dark:bg-emerald-500 text-emerald-900 dark:text-emerald-900",
     ON_HOLD: "bg-amber-200 dark:bg-amber-500 text-amber-900 dark:text-amber-900",
@@ -8,7 +10,11 @@ const statusColors = {
     CANCELLED: "bg-red-200 dark:bg-red-500 text-red-900 dark:text-red-900",
 };
 
-const ProjectCard = ({ project }) => {
+interface ProjectCardProps {
+    project: Project;
+}
+
+const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
     return (
         <Link to={`/projectsDetail?id=${project.id}&tab=tasks`} className="bg-white dark:bg-zinc-950 dark:bg-gradient-to-br dark:from-zinc-800/70 dark:to-zinc-900/50 border border-gray-200 dark:border-zinc-800 hover:border-gray-300 dark:hover:border-zinc-700 rounded-lg p-5 transition-all duration-200 group">
             {/* Header */}
