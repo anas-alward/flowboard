@@ -1,14 +1,15 @@
 import { useState, useEffect } from 'react'
 import Navbar from '../components/Navbar'
-import Sidebar from '../components/Sidebar'
+import AppSidebar from '../components/Sidebar'
 import { Outlet } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { loadTheme } from '../features/themeSlice'
 import { Loader2Icon } from 'lucide-react'
+import { SidebarProvider } from '../components/ui/sidebar'
+import type { RootState } from '../app/store'
 
 const Layout = () => {
-    const [isSidebarOpen, setIsSidebarOpen] = useState(false)
-    const { loading } = useSelector((state) => state.workspace)
+    const { loading } = useSelector((state: RootState) => state.workspace)
     const dispatch = useDispatch()
 
     // Initial load of theme
@@ -23,15 +24,17 @@ const Layout = () => {
     )
 
     return (
-        <div className="flex bg-white dark:bg-zinc-950 text-gray-900 dark:text-slate-100">
-            <Sidebar isSidebarOpen={isSidebarOpen} setIsSidebarOpen={setIsSidebarOpen} />
-            <div className="flex-1 flex flex-col h-screen">
-                <Navbar isSidebarOpen={isSidebarOpen} setIsSidebarOpen={setIsSidebarOpen} />
-                <div className="flex-1 h-full p-6 xl:p-10 xl:px-16 overflow-y-scroll">
-                    <Outlet />
+        <SidebarProvider>
+            <div className="flex bg-white dark:bg-zinc-950 text-gray-900 dark:text-slate-100 w-full h-screen overflow-hidden">
+                <AppSidebar />
+                <div className="flex-1 flex flex-col min-w-0">
+                    <Navbar />
+                    <div className="flex-1 p-6 xl:p-10 xl:px-16 overflow-y-auto w-full">
+                        <Outlet />
+                    </div>
                 </div>
             </div>
-        </div>
+        </SidebarProvider>
     )
 }
 

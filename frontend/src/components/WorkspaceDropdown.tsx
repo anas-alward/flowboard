@@ -1,11 +1,19 @@
-import React, { useState } from 'react';
-import { ChevronDown, Plus, Check, MoreVertical } from 'lucide-react';
+import React from 'react';
+import { ChevronDown, Plus, Check, Settings, Layout } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import type { RootState } from '../app/store';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+    DropdownMenuGroup,
+} from "./ui/dropdown-menu";
 
 const WorkspaceDropdown: React.FC = () => {
     const { currentWorkspace, workspaces } = useSelector((state: RootState) => state.workspace);
-    const [isOpen, setIsOpen] = useState(false);
 
     if (!currentWorkspace) return (
         <div className="w-full flex items-center justify-center p-4">
@@ -19,61 +27,64 @@ const WorkspaceDropdown: React.FC = () => {
     );
 
     return (
-        <div className="relative">
-            <button onClick={() => setIsOpen(!isOpen)} className="w-full flex items-center justify-between px-4 py-3 bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl hover:bg-gray-50 dark:hover:bg-zinc-700 transition duration-200" >
-                <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-bold flex-shrink-0">
-                        {currentWorkspace.name.charAt(0).toUpperCase()}
+        <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+                <button className="w-full flex items-center justify-between px-3 py-2 bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl hover:bg-gray-50 dark:hover:bg-zinc-700 transition duration-200 outline-none focus:ring-2 focus:ring-blue-500 group" >
+                    <div className="flex items-center gap-3 min-w-0">
+                        <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold flex-shrink-0">
+                            <Layout className="w-5 h-5" />
+                        </div>
+                        <div className="flex-1 min-w-0 text-left">
+                            <h2 className="text-sm font-bold text-gray-900 dark:text-white truncate">{currentWorkspace.name}</h2>
+                            <p className="text-[10px] font-medium text-gray-500 dark:text-zinc-400 truncate uppercase tracking-tight">Workspace</p>
+                        </div>
                     </div>
-                    <div className="flex-1 min-w-0 text-left">
-                        <p className="text-xs font-semibold text-gray-500 dark:text-zinc-400 truncate uppercase tracking-wider">Workspace</p>
-                        <h2 className="text-sm font-bold text-gray-900 dark:text-white truncate">{currentWorkspace.name}</h2>
-                    </div>
-                </div>
-                <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
-            </button>
+                    <ChevronDown className="w-4 h-4 text-gray-400 group-data-[state=open]:rotate-180 transition-transform" />
+                </button>
+            </DropdownMenuTrigger>
 
-            {isOpen && (
-                <div className="absolute top-full left-0 w-full mt-2 bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl shadow-xl z-50 py-2 animate-in fade-in zoom-in duration-200" >
-                    <div className="px-3 py-2 border-b border-gray-100 dark:border-zinc-700">
-                        <p className="text-[10px] uppercase font-bold text-gray-400 dark:text-zinc-500 tracking-widest px-1">Switch Workspace</p>
-                    </div>
-
-                    <div className="max-h-60 overflow-y-auto mt-1">
+            <DropdownMenuContent className="w-64" align="start">
+                <DropdownMenuGroup>
+                    <DropdownMenuLabel className="text-[10px] uppercase font-bold text-gray-400 dark:text-zinc-500 tracking-widest">
+                        Switch Workspace
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    
+                    <div className="max-h-60 overflow-y-auto">
                         {workspaces.map((workspace) => (
-                            <button key={workspace.id} className="w-full flex items-center justify-between px-3 py-2 hover:bg-gray-50 dark:hover:bg-zinc-700 group transition duration-200" >
+                            <DropdownMenuItem 
+                                key={workspace.id} 
+                                className="flex items-center justify-between cursor-pointer"
+                            >
                                 <div className="flex items-center gap-3 min-w-0">
                                     <div className="w-6 h-6 rounded bg-gray-100 dark:bg-zinc-700 flex items-center justify-center text-xs font-bold text-gray-600 dark:text-zinc-400">
                                         {workspace.name.charAt(0).toUpperCase()}
                                     </div>
-                                    <span className="text-sm text-gray-700 dark:text-zinc-300 truncate">{workspace.name}</span>
+                                    <span className="text-sm truncate">{workspace.name}</span>
                                 </div>
-                                {workspace.id === currentWorkspace.id ? (
+                                {workspace.id === currentWorkspace.id && (
                                     <Check className="w-4 h-4 text-blue-500" />
-                                ) : (
-                                    <div className="w-4 h-4" />
                                 )}
-                            </button>
+                            </DropdownMenuItem>
                         ))}
                     </div>
+                </DropdownMenuGroup>
 
-                    <div className="p-2 border-t border-gray-100 dark:border-zinc-700 mt-2">
-                        <button className="w-full flex items-center gap-2 px-3 py-2 text-sm text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition duration-200 font-medium" >
-                            <Plus className="w-4 h-4" />
-                            Create Workspace
-                        </button>
-                    </div>
+                <DropdownMenuSeparator />
+                
+                <DropdownMenuItem className="cursor-pointer text-blue-600 dark:text-blue-400 focus:text-blue-700 dark:focus:text-blue-300 font-medium">
+                    <Plus className="w-4 h-4 mr-2" />
+                    Create Workspace
+                </DropdownMenuItem>
 
-                    <button className="w-full flex items-center justify-between px-3 py-2 text-gray-500 dark:text-zinc-400 hover:bg-gray-50 dark:hover:bg-zinc-700 transition duration-200" >
-                        <div className="flex items-center gap-2 text-sm">
-                            <MoreVertical className="w-4 h-4" />
-                            Workspace Settings
-                        </div>
-                    </button>
-                </div>
-            )}
-        </div>
+                <DropdownMenuItem className="cursor-pointer text-gray-500 dark:text-zinc-400">
+                    <Settings className="w-4 h-4 mr-2" />
+                    Workspace Settings
+                </DropdownMenuItem>
+            </DropdownMenuContent>
+        </DropdownMenu>
     );
 };
 
 export default WorkspaceDropdown;
+

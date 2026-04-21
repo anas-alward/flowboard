@@ -1,32 +1,26 @@
 import React from 'react';
-import { SearchIcon, PanelLeft } from 'lucide-react'
+import { SearchIcon } from 'lucide-react'
 import { useDispatch, useSelector } from 'react-redux'
 import { toggleTheme } from '../features/themeSlice'
 import { MoonIcon, SunIcon } from 'lucide-react'
 import { assets } from '../assets/assets'
 import type { RootState, AppDispatch } from '../app/store';
+import { SidebarTrigger } from './ui/sidebar';
 
-interface NavbarProps {
-    setIsSidebarOpen: React.Dispatch<React.SetStateAction<boolean>>;
-    isSidebarOpen: boolean;
-}
-
-const Navbar: React.FC<NavbarProps> = ({ setIsSidebarOpen }) => {
+const Navbar: React.FC = () => {
     const dispatch = useDispatch<AppDispatch>();
     const { theme } = useSelector((state: RootState) => state.theme);
 
     return (
-        <div className="w-full bg-white dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 px-6 xl:px-16 py-3 flex-shrink-0">
+        <div className="w-full bg-white dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 px-6 xl:px-16 py-2 flex-shrink-0">
             <div className="flex items-center justify-between max-w-6xl mx-auto">
                 {/* Left section */}
                 <div className="flex items-center gap-4 min-w-0 flex-1">
                     {/* Sidebar Trigger */}
-                    <button onClick={() => setIsSidebarOpen((prev: boolean) => !prev)} className="sm:hidden p-2 rounded-lg transition-colors text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-zinc-800" >
-                        <PanelLeft size={20} />
-                    </button>
+                    <SidebarTrigger className="text-gray-700 dark:text-white" />
 
                     {/* Search Input */}
-                    <div className="relative flex-1 max-w-sm">
+                    <div className="relative flex-1 max-w-sm ml-2">
                         <SearchIcon className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400 dark:text-zinc-400 size-3.5" />
                         <input
                             type="text"

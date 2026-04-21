@@ -1,18 +1,22 @@
 import React, { useEffect, useState } from 'react';
-import { CheckSquareIcon, ChevronDownIcon, ChevronRightIcon } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import type { RootState } from '../app/store';
 import type { Task } from '../types';
+import {
+    SidebarGroup,
+    SidebarGroupLabel,
+    SidebarGroupContent,
+    SidebarMenu,
+    SidebarMenuItem,
+    SidebarMenuButton,
+} from './ui/sidebar';
 
 const MyTasksSidebar: React.FC = () => {
     const user = { id: 'user_1' } // Mock user
 
     const { currentWorkspace } = useSelector((state: RootState) => state.workspace);
-    const [showMyTasks, setShowMyTasks] = useState(false);
     const [myTasks, setMyTasks] = useState<Task[]>([]);
-
-    const toggleMyTasks = () => setShowMyTasks(prev => !prev);
 
     const getTaskStatusColor = (status: string) => {
         switch (status) {
@@ -42,50 +46,41 @@ const MyTasksSidebar: React.FC = () => {
     }, [currentWorkspace])
 
     return (
-        <div className="mt-6 px-3">
-            <div onClick={toggleMyTasks} className="flex items-center justify-between px-3 py-2 rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-zinc-800" >
-                <div className="flex items-center gap-2">
-                    <CheckSquareIcon className="w-4 h-4 text-gray-500 dark:text-zinc-400" />
-                    <h3 className="text-sm font-medium text-gray-700 dark:text-zinc-300">My Tasks</h3>
-                    <span className="bg-gray-200 dark:bg-zinc-700 text-gray-700 dark:text-zinc-300 text-xs px-2 py-0.5 rounded">
-                        {myTasks.length}
-                    </span>
-                </div>
-                {showMyTasks ? (
-                    <ChevronDownIcon className="w-4 h-4 text-gray-500 dark:text-zinc-400" />
-                ) : (
-                    <ChevronRightIcon className="w-4 h-4 text-gray-500 dark:text-zinc-400" />
-                )}
-            </div>
-
-            {showMyTasks && (
-                <div className="mt-2 pl-2">
-                    <div className="space-y-1">
-                        {myTasks.length === 0 ? (
-                            <div className="px-3 py-2 text-xs text-gray-500 dark:text-zinc-500 text-center">
-                                No tasks assigned
-                            </div>
-                        ) : (
-                            myTasks.map((task, index) => (
-                                <Link key={index} to={`/taskDetails?projectId=${task.projectId}&taskId=${task.id}`} className="w-full rounded-lg transition-all duration-200 text-gray-700 dark:text-zinc-300 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-black dark:hover:text-white" >
-                                    <div className="flex items-center gap-2 px-3 py-2 w-full min-w-0">
-                                        <div className={`w-2 h-2 rounded-full ${getTaskStatusColor(task.status)} flex-shrink-0`} />
+        <SidebarGroup>
+            <SidebarGroupLabel>
+                My Tasks
+                <span className="ml-2 bg-gray-200 dark:bg-zinc-700 text-gray-700 dark:text-zinc-300 text-[10px] px-1.5 py-0.5 rounded-full">
+                    {myTasks.length}
+                </span>
+            </SidebarGroupLabel>
+            <SidebarGroupContent>
+                <SidebarMenu>
+                    {myTasks.length === 0 ? (
+                        <div className="px-3 py-2 text-xs text-gray-500 dark:text-zinc-500 italic">
+                            No tasks assigned
+                        </div>
+                    ) : (
+                        myTasks.map((task, index) => (
+                            <SidebarMenuItem key={index}>
+                                <SidebarMenuButton asChild tooltip={task.title} className="h-auto py-2">
+                                    <Link to={`/taskDetails?projectId=${task.projectId}&taskId=${task.id}`} className="flex items-start gap-2 w-full">
+                                        <div className={`w-2 h-2 mt-1.5 rounded-full ${getTaskStatusColor(task.status)} flex-shrink-0`} />
                                         <div className="flex-1 min-w-0">
-                                            <p className="text-xs font-medium truncate">
+                                            <p className="font-medium truncate leading-tight">
                                                 {task.title}
                                             </p>
-                                            <p className="text-xs text-gray-500 dark:text-zinc-500 lowercase">
+                                            <p className="text-[10px] text-gray-500 dark:text-zinc-500 lowercase">
                                                 {task.status.replace('_', ' ')}
                                             </p>
                                         </div>
-                                    </div>
-                                </Link>
-                            ))
-                        )}
-                    </div>
-                </div>
-            )}
-        </div>
+                                    </Link>
+                                </SidebarMenuButton>
+                            </SidebarMenuItem>
+                        ))
+                    )}
+                </SidebarMenu>
+            </SidebarGroupContent>
+        </SidebarGroup>
     );
 }
 
