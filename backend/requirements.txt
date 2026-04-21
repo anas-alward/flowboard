@@ -1,0 +1,7 @@
+django
+redis
+django-redis
+psycopg2-binary
+django-environ
+djangorestframework
+djangorestframework-simplejwt
